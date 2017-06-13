@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_all"
+            android:icon="@drawable/ic_menu_camera"
+            android:checked="true"
+            android:title="Все тесты" />
+        <item
+            android:id="@+id/nav_personal"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Личностные опросники" />
+        <item
+            android:id="@+id/nav_professional"
+            android:icon="@android:drawable/ic_menu_mylocation"
+            android:title="Профориентационные тесты" />
+        <item
+            android:id="@+id/nav_gender"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Семейные, гендерные тесты" />
+        <item
+            android:id="@+id/nav_various"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Разные тесты" />
+        <item
+            android:id="@+id/nav_child"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Тесты для детей" />
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Рассказать друзьям" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="qwerqwer" />
+        </menu>
+    </item>
+
+</menu>

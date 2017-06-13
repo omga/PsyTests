@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginRight="0dp"
+    android:layout_marginEnd="0dp"
+    android:background="@color/colorPrimaryLight"
+    >
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/scrollViewDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_alignParentTop="true"
+        >
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Товарищ рассказывает вам о своих невзгодах. Дадите ли вы ему понять, что вас это мало интересует, даже если это так? "
+            style="@style/MyTextContent"
+            android:background="@color/colorPrimaryLight"
+            android:minHeight="160dp"
+            android:gravity="center"/>
+    </android.support.v4.widget.NestedScrollView>
+    <TextView
+        android:id="@+id/questionIndex"
+        style="@style/MyTextContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1/10"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list"
+        android:visibility="visible"
+        android:name="com.psycholab.psychotests.QuizFragment"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:layout_gravity="center"
+        app:layoutManager="LinearLayoutManager"
+        tools:context="com.psylabs.psychotests.ui.QuizFragment"
+        tools:listitem="@layout/fragment_answer_item"
+        android:layout_below="@+id/scrollViewDescription"
+        android:layout_above="@id/questionIndex" />
+
+
+</RelativeLayout>
