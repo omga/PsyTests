@@ -18,7 +18,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -58,10 +57,6 @@ public class MainActivity extends AppCompatActivity
     CollapsingToolbarLayout collapsingToolbar;
     @BindView(R.id.image_toolbar)
     ImageView imageViewToolbar;
-    @BindView(R.id.fab)
-    FloatingActionButton fab;
-    @BindView(R.id.fabBottom)
-    FloatingActionButton fabBottom;
     @BindView(R.id.nav_view)
     NavigationView navigationView;
     @BindView(R.id.drawer_layout)
@@ -80,20 +75,7 @@ public class MainActivity extends AppCompatActivity
         App.getComponent().inject(this);
         ButterKnife.bind(this);
         navigationView.setNavigationItemSelectedListener(this);
-        appBarListener = new AppBarStateChangeListener() {
-            @Override
-            public void onStateChanged(AppBarLayout appBarLayout, State state) {
-                Log.d(TAG, state.name());
-                if(state.equals(State.COLLAPSED)) {
-                    fabBottom.show();
-                } else {
-                    fabBottom.hide();
-
-                }
-            }
-        };
         setupToolbar();
-        addFabListener();
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
         mFragmentTransaction.replace(R.id.container, QuizListFragment.newInstance(1,0)).commit();
@@ -129,36 +111,6 @@ public class MainActivity extends AppCompatActivity
         unsubscribe();
     }
 
-    @OnClick({R.id.fab, R.id.fabBottom})
-    public void startQuiz() {
-        Log.d(TAG,"startQuiz");
-        rxBus.send(new StartQuizEvent());
-        removeFabListener();
-    }
-
-    private void addFabListener() {
-        fab.setVisibility(View.GONE);
-        CoordinatorLayout.LayoutParams p =
-                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
-        p.setAnchorId(R.id.app_bar);
-        fab.setLayoutParams(p);
-        if(appBarLayout.getHeight() - appBarLayout.getBottom() == 0)
-            fab.show();
-        else
-            fabBottom.show();
-        appBarLayout.addOnOffsetChangedListener(appBarListener);
-    }
-
-    private void removeFabListener() {
-        fab.hide();
-        CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
-        p.setAnchorId(View.NO_ID);
-        fab.setLayoutParams(p);
-        fab.setVisibility(View.GONE);
-        fabBottom.hide();
-        appBarLayout.removeOnOffsetChangedListener(appBarListener);
-    }
-
     private void subscribe() {
         subscribtion = rxBus.toObservable().subscribe(o -> {
             Log.d(TAG,"rxbus accept");
@@ -188,28 +140,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -227,12 +157,6 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_gender) {
             fragment = QuizListFragment.newInstance(1,3);
 
-        } else if (id == R.id.nav_various) {
-            fragment = QuizListFragment.newInstance(1,4);
-
-        } else if (id == R.id.nav_child) {
-            fragment = QuizListFragment.newInstance(1,5);
-
         } else { //if (id == R.id.nav_send) {
             fragment =  new MainActivityFragment();
         }
@@ -249,7 +173,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onListFragmentInteraction(QuizItem quiz) {
         goToQuizActivity(quiz);
-//        addFabListener();
 //        mFragmentTransaction = mFragmentManager.beginTransaction();
 //        mFragmentTransaction.replace(R.id.container, QuizFragment.newInstance(quiz)).commit();
     }

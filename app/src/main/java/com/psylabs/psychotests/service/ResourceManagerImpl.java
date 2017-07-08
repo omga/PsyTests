@@ -27,7 +27,6 @@ public class ResourceManagerImpl implements ResourceManager {
     public static final int PROFESSIONAL = 2;
     public static final int FAMILY_AND_GENDER = 3;
     public static final int VARIOUS = 4;
-    public static final int FOR_KIDS = 5;
 
     private Context context;
     private SharedPreferences sharedPrefs;
@@ -67,15 +66,21 @@ public class ResourceManagerImpl implements ResourceManager {
         }
         return quizItems;
     }
-
+//LOL WTF IS THIS SHIT?????
     public QuizProcessor getQuizProcessor(int id) {
         switch (id) {
             case 0: return new KindnessQuiz(context);
+            case 1000: return new KindnessQuiz(context);
             case 1: return new FriendsQuiz(context);
+            case 1001: return new FriendsQuiz(context);
             case 2: return new ShynessQuiz(context);
+            case 1002: return new ShynessQuiz(context);
             case 3: return new LifePrinciplesQuiz(context);
+            case 1003: return new LifePrinciplesQuiz(context);
             case 4: return new ArtisticQuiz(context);
+            case 2004: return new ArtisticQuiz(context);
             case 5: return new IsItLoveQuiz(context);
+            case 3005: return new IsItLoveQuiz(context);
         }
         return new KindnessQuiz(context);
     }
