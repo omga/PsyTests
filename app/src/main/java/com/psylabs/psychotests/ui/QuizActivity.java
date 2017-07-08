@@ -249,8 +249,8 @@ public class QuizActivity extends AppCompatActivity {
     private void setFabExit() {
         View.OnClickListener listener = v -> finish();
 
-        fab.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
-        fabBottom.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+        fab.setImageResource(R.drawable.ic_home);
+        fabBottom.setImageResource(R.drawable.ic_home);
         fab.setOnClickListener(listener);
         fabBottom.setOnClickListener(listener);
     }

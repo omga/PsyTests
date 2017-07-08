@@ -280,13 +280,15 @@ public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.
 
     private void setFabBackIcon() {
         fab.animate()
-                .rotation(540)
+                .rotation(360)
                 .setDuration(800)
                 .setInterpolator(interpolator);
         fabBottom.animate()
-                .rotation(540)
+                .rotation(360)
                 .setDuration(800)
                 .setInterpolator(interpolator);
+        fab.setImageResource(R.drawable.ic_media_back);
+        fabBottom.setImageResource(R.drawable.ic_media_back);
     }
 
     private void setFabForwardIcon() {
@@ -298,6 +300,8 @@ public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.
                 .rotation(0)
                 .setDuration(500)
                 .setInterpolator(interpolator);
+        fab.setImageResource(android.R.drawable.ic_media_play);
+        fabBottom.setImageResource(android.R.drawable.ic_media_play);
     }
 
     private Animator animateRevealColorFromCoordinates(ViewGroup viewRoot, @ColorRes int color, int x, int y) {

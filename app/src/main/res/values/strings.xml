@@ -18,27 +18,20 @@
         <item>Большая любовь или легкое увлечение?</item>
         <item>Обидчивость</item>
         <item>Приятно ли с вами общаться?</item>
-        <item>ли вы?</item>
-        <item>Лидер</item>
-        <item>Пидер</item>
     </string-array>
     <string-array name="personality_tests">
         <item>Добрый ли вы?</item>
         <item>Ваши друзья</item>
         <item>Застенчивость</item>
-        <item>Лидер</item>
-        <item>Взгляд на Вас со стороны</item>
         <item>Опросник жизненной позиции</item>
         <item>Обидчивость</item>
         <item>Приятно ли с вами общаться?</item>
     </string-array>
     <string-array name="professional_tests">
         <item>Артистические наклонности</item>
-        <item>Лидер</item>
     </string-array>
     <string-array name="family_and_gender_tests">
         <item>Большая любовь или легкое увлечение?</item>
-        <item>Пидер</item>
     </string-array>
     <string-array name="various_tests" />
     <string-array name="kids_tests" />
@@ -134,7 +127,6 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
-
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="redo_quiz">Пройти заново</string>
