@@ -133,7 +133,7 @@ public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.
     private void initUI() {
         if(quizProcessor!=null) {
             description.setText(quizProcessor.getDescription());
-            questionIndex.setText("Колличесво Вопросов: " + quizProcessor.getQuestionsCount());
+            questionIndex.setText("Вопросов: " + quizProcessor.getQuestionsCount());
             rxBus.send(new ImageToolbarEvent(quizProcessor.getQuizImage()));
             Bitmap bm = BitmapFactory.decodeResource(getResources(), quizProcessor.getQuizImage());
             Palette.from(bm).generate(palette -> {
@@ -239,7 +239,7 @@ public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.
                 adapter.setData(quizProcessor.getCurrentVariants());
             }
             description.setText(question);
-            questionIndex.setText(quizProcessor.getCurrentIndex() + "/" + quizProcessor.getQuestionsCount());
+            questionIndex.setText(quizProcessor.getCurrentIndex() + "/" + quizProcessor.getQuestionsCount()+1);
         }
     }
 

@@ -16,6 +16,7 @@
         <item>Опросник жизненной позиции</item>
         <item>Артистические наклонности</item>
         <item>Большая любовь или легкое увлечение?</item>
+        <item>Ревнивость</item>
         <item>Обидчивость</item>
         <item>Приятно ли с вами общаться?</item>
     </string-array>
@@ -32,6 +33,7 @@
     </string-array>
     <string-array name="family_and_gender_tests">
         <item>Большая любовь или легкое увлечение?</item>
+        <item>Ревнивость</item>
     </string-array>
     <string-array name="various_tests" />
     <string-array name="kids_tests" />

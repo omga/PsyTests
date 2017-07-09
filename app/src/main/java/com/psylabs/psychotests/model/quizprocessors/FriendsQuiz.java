@@ -70,20 +70,23 @@ public class FriendsQuiz extends BaseQuiz {
         Log.d("FRIENDS","count: " + answers.size());
         Log.d("FRIENDS","count questions: " + questions.length);
         Log.d("FRIENDS","sum: " + sum);
-        if(sum<75)
-            return res1;
-        if(sum<145)
-            return res2;
-        if(sum<220)
-            return res3;
-        else
-            return res4;
+        String res;
+        if(sum<75) {
+            res = res1;
+            resultImage = R.drawable.friends_medium;
+        } else if(sum<145) {
+            res = res2;
+            resultImage = R.drawable.friends_medium;
+        } else if(sum<220) {
+            res = res3;
+            resultImage = R.drawable.kindness_kind;
+        } else {
+            res= res4;
+            resultImage = R.drawable.kindness_kind;
+        }
+        return res;
     }
 
-    @Override
-    public int getQuizImage() {
-        return R.drawable.lemur_toolbar;
-    }
 
     @Override
     public String[] getCurrentVariants() {
@@ -93,5 +96,15 @@ public class FriendsQuiz extends BaseQuiz {
     @Override
     public boolean isDifferentVariants() {
         return isDifferentVariants;
+    }
+
+    @Override
+    public int getQuizImage() {
+        return R.drawable.lemur_toolbar;
+    }
+
+    @Override
+    public int getResultImage() {
+        return resultImage;
     }
 }

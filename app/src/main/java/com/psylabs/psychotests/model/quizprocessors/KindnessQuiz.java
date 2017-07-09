@@ -26,6 +26,7 @@ public class KindnessQuiz extends BaseQuiz {
         res1 = resources.getString(R.string.dobrota_res_1);
         res2 = resources.getString(R.string.dobrota_res_2);
         res3 = resources.getString(R.string.dobrota_res_3);
+        resultImage = R.drawable.kindness_quiz;
     }
 
     @Override
@@ -44,8 +45,16 @@ public class KindnessQuiz extends BaseQuiz {
         Log.d("KindnessQuiz","count: " + answers);
         Log.d("KindnessQuiz","count questions: " + questions.length);
         Log.d("KindnessQuiz","sum: " + result);
-        return  result > 8 ? res1 :
-                    result < 4 ? res3 : res2;
+        String res = res2;
+        if(result > 8) {
+            res = res1;
+            resultImage = R.drawable.kindness_kind;
+        } else if (result < 4) {
+            res = res3;
+            resultImage = R.drawable.kindness_mean;
+        }
+
+        return res;
     }
 
     @Override
@@ -56,5 +65,15 @@ public class KindnessQuiz extends BaseQuiz {
     @Override
     public boolean isDifferentVariants() {
         return isDifferentVariants;
+    }
+
+    @Override
+    public int getQuizImage() {
+        return R.drawable.kindness_quiz;
+    }
+
+    @Override
+    public int getResultImage() {
+        return resultImage;
     }
 }

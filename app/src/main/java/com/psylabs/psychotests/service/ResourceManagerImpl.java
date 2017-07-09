@@ -10,6 +10,7 @@ import com.psylabs.psychotests.model.QuizProcessor;
 import com.psylabs.psychotests.model.quizprocessors.ArtisticQuiz;
 import com.psylabs.psychotests.model.quizprocessors.FriendsQuiz;
 import com.psylabs.psychotests.model.quizprocessors.IsItLoveQuiz;
+import com.psylabs.psychotests.model.quizprocessors.JealousyQuiz;
 import com.psylabs.psychotests.model.quizprocessors.KindnessQuiz;
 import com.psylabs.psychotests.model.quizprocessors.LifePrinciplesQuiz;
 import com.psylabs.psychotests.model.quizprocessors.ShynessQuiz;
@@ -81,6 +82,9 @@ public class ResourceManagerImpl implements ResourceManager {
             case 2004: return new ArtisticQuiz(context);
             case 5: return new IsItLoveQuiz(context);
             case 3005: return new IsItLoveQuiz(context);
+            case 6: return new JealousyQuiz(context);
+            case 3006: return new JealousyQuiz(context);
+
         }
         return new KindnessQuiz(context);
     }

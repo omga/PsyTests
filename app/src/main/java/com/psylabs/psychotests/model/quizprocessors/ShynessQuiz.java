@@ -28,6 +28,7 @@ public class ShynessQuiz extends BaseQuiz {
         res3 = resources.getString(R.string.shyness_res_3);
         res4 = resources.getString(R.string.shyness_res_4);
         res5 = resources.getString(R.string.shyness_res_5);
+        quizImage = R.drawable.shyness;
     }
 
     @Override

@@ -62,16 +62,28 @@ public class LifePrinciplesQuiz extends BaseQuiz {
                 bbsum++;
         }
         int max = Math.max(Math.max(ggsum, gbsum),Math.max(bgsum,bbsum));
-        return max == ggsum ? res1 :
-                max == gbsum? res2:
-                        max == bgsum? res3:
-                                res4;
+        String res;
+        if(max == ggsum) {
+            res = res1;
+            resultImage = R.drawable.life_priniples_hh;
+        } else if(max == gbsum) {
+            res = res2;
+            resultImage = R.drawable.life_penguin;
+        } else if(max == bgsum) {
+            res = res3;
+            resultImage = R.drawable.life_penguin;
+        } else {
+            res= res4;
+            resultImage = R.drawable.life_priniples_pp;
+        }
+        return res;
+
+//        return max == ggsum ? res1 :
+//                max == gbsum? res2:
+//                        max == bgsum? res3:
+//                                res4;
     }
 
-    @Override
-    public int getQuizImage() {
-        return R.drawable.life_penguin;
-    }
 
     @Override
     public String[] getCurrentVariants() {
@@ -81,6 +93,16 @@ public class LifePrinciplesQuiz extends BaseQuiz {
     @Override
     public boolean isDifferentVariants() {
         return isDifferentVariants;
+    }
+
+    @Override
+    public int getQuizImage() {
+        return R.drawable.life_penguin;
+    }
+
+    @Override
+    public int getResultImage() {
+        return resultImage;
     }
 }
 
