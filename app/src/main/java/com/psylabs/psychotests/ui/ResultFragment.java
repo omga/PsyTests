@@ -3,6 +3,10 @@ package com.psylabs.psychotests.ui;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,6 +14,7 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.graphics.Palette;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -30,11 +35,11 @@ import javax.inject.Inject;
  */
 public class ResultFragment extends Fragment {
     private static final String QUIZ_RESULT_STRING = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String QUIZ_RESULT_IMAGE = "param2";
     private static final int DELAY = 100;
 
     private String resultText;
-    private String mParam2;
+    private int resultImage;
     @Inject
     RxBus rxBus;
     private TextView resultTextView;
@@ -50,15 +55,15 @@ public class ResultFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param resultText Parameter 1.
-     * @param param2 Parameter 2.
+     * @param resultImage Parameter 2.
      * @return A new instance of fragment ResultFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ResultFragment newInstance(String resultText, String param2) {
+    public static ResultFragment newInstance(String resultText, int resultImage) {
         ResultFragment fragment = new ResultFragment();
         Bundle args = new Bundle();
         args.putString(QUIZ_RESULT_STRING, resultText);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(QUIZ_RESULT_IMAGE, resultImage);
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,7 +74,7 @@ public class ResultFragment extends Fragment {
         App.getComponent().inject(this);
         if (getArguments() != null) {
             resultText = getArguments().getString(QUIZ_RESULT_STRING);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            resultImage = getArguments().getInt(QUIZ_RESULT_IMAGE);
         }
     }
 
@@ -86,27 +91,33 @@ public class ResultFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        new Handler().postDelayed(this::revealGreen,100);
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), resultImage);
+        Palette.from(bm).generate(palette -> {
+            int backgroundColor = palette.getLightMutedColor(Color.WHITE);
+            getActivity().getWindow().setBackgroundDrawable(new ColorDrawable(backgroundColor));
+            new Handler().postDelayed(() -> revealBackgroundColor(backgroundColor),100);
+
+        });
     }
 
-    private void revealGreen() {
-        animateRevealColor(rootView, R.color.colorPrimaryLight);
+    private void revealBackgroundColor(int color) {
+        animateRevealColor(rootView, color);
         resultTextView.setText(resultText);
         resultTextView.setVisibility(View.VISIBLE);
     }
 
-    private void animateRevealColor(ViewGroup viewRoot, @ColorRes int color) {
+    private void animateRevealColor(ViewGroup viewRoot, int color) {
         int cx = (viewRoot.getLeft() + viewRoot.getRight()) / 2;
         int cy = (viewRoot.getTop() + viewRoot.getBottom()) / 2;
         animateRevealColorFromCoordinates(viewRoot, color, cx, cy);
     }
 
-    private Animator animateRevealColorFromCoordinates(ViewGroup viewRoot, @ColorRes int color, int x, int y) {
+    private Animator animateRevealColorFromCoordinates(ViewGroup viewRoot, int color, int x, int y) {
         float finalRadius = (float) Math.hypot(viewRoot.getWidth(), viewRoot.getHeight());
         Animator anim = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ?
                 ViewAnimationUtils.createCircularReveal(viewRoot, x, y, 0, finalRadius):
                 ObjectAnimator.ofFloat(rootView, "alpha", 0f, 1f);
-        viewRoot.setBackgroundColor(ContextCompat.getColor(getContext(), color));
+        viewRoot.setBackgroundColor(color);
         anim.setDuration(getResources().getInteger(R.integer.anim_duration_very_long));
         anim.setInterpolator(new AccelerateDecelerateInterpolator());
         anim.start();

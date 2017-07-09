@@ -4,6 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,6 +34,7 @@ import com.psylabs.psychotests.R;
 import com.psylabs.psychotests.model.QuizItem;
 import com.psylabs.psychotests.model.QuizProcessor;
 import com.psylabs.psychotests.model.rx.ImageToolbarEvent;
+import com.psylabs.psychotests.model.rx.PaletteChangedEvent;
 import com.psylabs.psychotests.model.rx.StartQuizEvent;
 import com.psylabs.psychotests.service.ResourceManager;
 import com.psylabs.psychotests.service.RxBus;
@@ -68,6 +73,7 @@ public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.
     boolean quizStarted = false;
     private Disposable subscribtion;
     private FloatingActionButton fab, fabBottom;
+    private int backgroundColor;
 
 
     /**
@@ -128,9 +134,14 @@ public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.
         if(quizProcessor!=null) {
             description.setText(quizProcessor.getDescription());
             questionIndex.setText("Колличесво Вопросов: " + quizProcessor.getQuestionsCount());
+            rxBus.send(new ImageToolbarEvent(quizProcessor.getQuizImage()));
+            Bitmap bm = BitmapFactory.decodeResource(getResources(), quizProcessor.getQuizImage());
+            Palette.from(bm).generate(palette -> {
+                backgroundColor = palette.getLightMutedColor(Color.WHITE);
+                description.setBackgroundColor(backgroundColor);
+                getActivity().getWindow().setBackgroundDrawable(new ColorDrawable(backgroundColor));
+            });
         }
-        getActivity().getWindow().setBackgroundDrawable(new ColorDrawable(
-                ContextCompat.getColor(getContext(), R.color.colorPrimaryLight)));
     }
 
     @Override
@@ -163,7 +174,6 @@ public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.
         Log.d(TAG,"onStart");
         super.onStart();
         subscribe();
-        rxBus.send(new ImageToolbarEvent(quizProcessor.getQuizImage()));
     }
 
     @Override
@@ -251,7 +261,8 @@ public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.
             }
         });
         description.setText(question);
-        description.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
+//        description.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryLight));
+        description.setBackgroundColor(backgroundColor);
     }
 
     private void animateButtonsOut() {

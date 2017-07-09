@@ -1,5 +1,9 @@
 package com.psylabs.psychotests.ui;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -12,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.util.Log;
@@ -28,9 +33,12 @@ import com.psylabs.psychotests.model.rx.QuizFinishedEvent;
 import com.psylabs.psychotests.model.rx.StartQuizEvent;
 import com.psylabs.psychotests.service.ResourceManager;
 import com.psylabs.psychotests.service.RxBus;
+import com.psylabs.psychotests.service.Util;
 import com.psylabs.psychotests.ui.adapter.AppBarStateChangeListener;
 
 import org.parceler.Parcels;
+
+import java.io.File;
 
 import javax.inject.Inject;
 
@@ -68,7 +76,7 @@ public class QuizActivity extends AppCompatActivity {
     private Interpolator interpolator;
     int mStackLevel = 0;
     QuizItem quiz;
-    private Disposable subscribtion;
+    private Disposable subscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,9 +87,7 @@ public class QuizActivity extends AppCompatActivity {
         App.getComponent().inject(this);
         ButterKnife.bind(this);
 //        ViewCompat.setTransitionName(appBarLayout, EXTRA_IMAGE);
-
         setSupportActionBar(toolbar);
-
         Parcelable parcelable = getIntent().getParcelableExtra(QUIZ_EXTRA);
         if(parcelable !=null) {
             quiz = Parcels.unwrap(parcelable);
@@ -133,6 +139,15 @@ public class QuizActivity extends AppCompatActivity {
     private void setImageToolbar(int res) {
         imageViewToolbar.setImageResource(res);
         appBarLayout.setExpanded(true);
+
+        //set collapsed toolbar and status bar color using muted color from image
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), res);
+        Palette.from(bm).generate(palette -> {
+            collapsingToolbar.setContentScrimColor(palette.getMutedColor(
+                    ContextCompat.getColor(QuizActivity.this, R.color.colorPrimary)));
+            collapsingToolbar.setStatusBarScrimColor(palette.getMutedColor(
+                    ContextCompat.getColor(QuizActivity.this, R.color.colorPrimary)));
+            });
     }
 
     private void initActivityTransitions() {
@@ -224,39 +239,17 @@ public class QuizActivity extends AppCompatActivity {
         appBarLayout.removeOnOffsetChangedListener(appBarListener);
     }
 
-    private void setFabBackIcon() {
-        fab.animate()
-                .rotation(540)
-                .setDuration(800)
-                .setInterpolator(interpolator);
-        fabBottom.animate()
-                .rotation(540)
-                .setDuration(800)
-                .setInterpolator(interpolator);
-    }
-
-    private void setFabForwardIcon() {
-        fab.animate()
-                .rotation(0)
-                .setDuration(500)
-                .setInterpolator(interpolator);
-        fabBottom.animate()
-                .rotation(0)
-                .setDuration(500)
-                .setInterpolator(interpolator);
-    }
-
-    private void setFabExit() {
-        View.OnClickListener listener = v -> finish();
-
-        fab.setImageResource(R.drawable.ic_home);
-        fabBottom.setImageResource(R.drawable.ic_home);
+    private void setFabShare(String sharingText) {
+        View.OnClickListener listener = v -> Util.shareSocial(this, sharingText, R.drawable.sad_cat_pillow);
+        fab.setImageResource(R.drawable.ic_action_share);
+        fabBottom.setImageResource(R.drawable.ic_action_share);
         fab.setOnClickListener(listener);
         fabBottom.setOnClickListener(listener);
+
     }
 
     private void subscribe() {
-        subscribtion = rxBus.toObservable().observeOn(AndroidSchedulers.mainThread())
+        subscription = rxBus.toObservable().observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(o -> {
             Log.d(TAG,"rxbus accept");
@@ -264,10 +257,10 @@ public class QuizActivity extends AppCompatActivity {
                 Log.d(TAG,"rxbus setFabForwardIcon");
                 setImageToolbar(((ImageToolbarEvent) o).imageResId);
             } else if( o instanceof QuizFinishedEvent) {
-//                setFabForwardIcon();
-                setFabExit();
+                String resultText = ((QuizFinishedEvent) o).result;
+                setFabShare(resultText);
                 Fragment newFragment = ResultFragment.newInstance(
-                        ((QuizFinishedEvent) o).result, "hi");
+                        resultText, ((QuizFinishedEvent) o).resultImage);
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.container, newFragment);
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -278,8 +271,8 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void unsubscribe() {
-        if(!subscribtion.isDisposed())
-            subscribtion.dispose();
+        if(!subscription.isDisposed())
+            subscription.dispose();
     }
 
 

@@ -70,7 +70,7 @@ public abstract class BaseQuiz implements QuizProcessor {
         if(questions.length> currentQuestionIndex+1)
                 return questions[++currentQuestionIndex];
         else {
-            rxBus.send(new QuizFinishedEvent(calculate()));
+            rxBus.send(new QuizFinishedEvent(calculate(), getResultImage()));
             rxBus.send(new ImageToolbarEvent(getResultImage()));
             return "";
         }

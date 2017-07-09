@@ -6,8 +6,10 @@ package com.psylabs.psychotests.model.rx;
 
 public class QuizFinishedEvent {
     public String result;
+    public int resultImage;
 
-    public QuizFinishedEvent(String result) {
+    public QuizFinishedEvent(String result, int resultImage) {
         this.result = result;
+        this.resultImage = resultImage;
     }
 }
