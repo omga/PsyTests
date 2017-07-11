@@ -240,7 +240,10 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void setFabShare(String sharingText) {
-        View.OnClickListener listener = v -> Util.shareSocial(this, sharingText, R.drawable.sad_cat_pillow);
+        View.OnClickListener listener = v -> {
+            if(Util.checkPermission(QuizActivity.this))
+                Util.shareSocial(this, sharingText, R.drawable.sad_cat_pillow);
+        };
         fab.setImageResource(R.drawable.ic_action_share);
         fabBottom.setImageResource(R.drawable.ic_action_share);
         fab.setOnClickListener(listener);

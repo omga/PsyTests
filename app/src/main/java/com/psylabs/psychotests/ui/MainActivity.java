@@ -28,6 +28,7 @@ import com.psylabs.psychotests.model.QuizItem;
 import com.psylabs.psychotests.model.rx.StartQuizEvent;
 import com.psylabs.psychotests.service.ResourceManager;
 import com.psylabs.psychotests.service.RxBus;
+import com.psylabs.psychotests.service.Util;
 import com.psylabs.psychotests.ui.adapter.AppBarStateChangeListener;
 
 import org.parceler.Parcels;
@@ -145,6 +146,18 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        if(id == R.id.nav_send) {
+            if(Util.checkPermission(this))
+                Util.rateApp(this);
+            return true;
+        }
+        if(id == R.id.nav_share) {
+            if(Util.checkPermission(this))
+                Util.shareSocial(this, getString(R.string.sharing_text),
+                    R.drawable.psy_logo_grey_bg);
+            return true;
+        }
+
         Fragment fragment;
         if (id == R.id.nav_all) {
             fragment = QuizListFragment.newInstance(1,0);

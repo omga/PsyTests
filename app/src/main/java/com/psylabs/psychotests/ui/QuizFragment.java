@@ -239,7 +239,7 @@ public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.
                 adapter.setData(quizProcessor.getCurrentVariants());
             }
             description.setText(question);
-            questionIndex.setText(quizProcessor.getCurrentIndex() + "/" + quizProcessor.getQuestionsCount()+1);
+            questionIndex.setText(quizProcessor.getCurrentIndex()+1 + "/" + quizProcessor.getQuestionsCount());
         }
     }
 
