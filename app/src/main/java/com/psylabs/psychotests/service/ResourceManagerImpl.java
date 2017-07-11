@@ -79,11 +79,11 @@ public class ResourceManagerImpl implements ResourceManager {
             case 3: return new LifePrinciplesQuiz(context);
             case 1003: return new LifePrinciplesQuiz(context);
             case 4: return new ArtisticQuiz(context);
-            case 2004: return new ArtisticQuiz(context);
+            case 2000: return new ArtisticQuiz(context);
             case 5: return new IsItLoveQuiz(context);
-            case 3005: return new IsItLoveQuiz(context);
+            case 3000: return new IsItLoveQuiz(context);
             case 6: return new JealousyQuiz(context);
-            case 3006: return new JealousyQuiz(context);
+            case 3001: return new JealousyQuiz(context);
 
         }
         return new KindnessQuiz(context);

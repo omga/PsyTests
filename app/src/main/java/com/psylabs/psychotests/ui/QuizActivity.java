@@ -77,6 +77,7 @@ public class QuizActivity extends AppCompatActivity {
     int mStackLevel = 0;
     QuizItem quiz;
     private Disposable subscription;
+    private int imgResId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +138,7 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void setImageToolbar(int res) {
+        imgResId = res;
         imageViewToolbar.setImageResource(res);
         appBarLayout.setExpanded(true);
 
@@ -242,7 +244,7 @@ public class QuizActivity extends AppCompatActivity {
     private void setFabShare(String sharingText) {
         View.OnClickListener listener = v -> {
             if(Util.checkPermission(QuizActivity.this))
-                Util.shareSocial(this, sharingText, R.drawable.sad_cat_pillow);
+                Util.shareSocial(this, sharingText, imgResId);
         };
         fab.setImageResource(R.drawable.ic_action_share);
         fabBottom.setImageResource(R.drawable.ic_action_share);
