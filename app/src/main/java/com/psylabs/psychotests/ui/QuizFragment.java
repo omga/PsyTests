@@ -49,6 +49,8 @@ import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 
 public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.OnAnswerListener {
@@ -56,8 +58,14 @@ public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.
     private static final String ARG_QUIZ = "quiz_arg";
     private static final int DELAY = 100;
     private static final String TAG = "QuizFragment";
-    private TextView description, questionIndex;
-    private RecyclerView recyclerView;
+    @BindView(R.id.description)
+    TextView description;
+    @BindView(R.id.questionIndex)
+    TextView questionIndex;
+    @BindView(R.id.list)
+    RecyclerView recyclerView;
+    @BindView(R.id.scrollViewDescription)
+    NestedScrollView scrollViewDescription;
     private QuizItem quiz;
     private QuizProcessor quizProcessor;
     @Inject
@@ -65,7 +73,6 @@ public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.
     @Inject
     RxBus rxBus;
     ViewGroup rootView;
-    NestedScrollView scrollViewDescription;
     Interpolator interpolator;
     Animation inAnim, outAnim;
     String question;
@@ -109,10 +116,7 @@ public class QuizFragment extends Fragment implements AnswerRecyclerViewAdapter.
         Log.d(TAG,"onCreateView");
         View view = inflater.inflate(R.layout.fragment_quiz, container, false);
         rootView = (ViewGroup) view;
-        recyclerView = (RecyclerView) view.findViewById(R.id.list);
-        scrollViewDescription = (NestedScrollView) view.findViewById(R.id.scrollViewDescription);
-        description = (TextView) view.findViewById(R.id.description);
-        questionIndex = (TextView) view.findViewById(R.id.questionIndex);
+        ButterKnife.bind(this, rootView);
         fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         fabBottom = (FloatingActionButton) getActivity().findViewById(R.id.fabBottom);
         initAnimations();

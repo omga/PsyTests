@@ -170,18 +170,6 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        Log.d(TAG, "onResume");
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        Log.d(TAG, "onPause");
-        super.onPause();
-    }
-
-    @Override
     protected void onStop() {
         Log.d(TAG, "onStop");
         super.onStop();
@@ -201,21 +189,6 @@ public class QuizActivity extends AppCompatActivity {
         rxBus.send(new StartQuizEvent());
 //        appBarLayout.setExpanded(false);
 
-    }
-
-      void addFragmentToStack() {
-        mStackLevel++;
-
-        // Instantiate a new fragment.
-        Fragment newFragment = CountingFragment.newInstance(mStackLevel);
-
-        // Add the fragment to the activity, pushing this transaction
-        // on to the back stack.
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.container, newFragment);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.addToBackStack(null);
-        ft.commit();
     }
 
     private void addFabListener() {

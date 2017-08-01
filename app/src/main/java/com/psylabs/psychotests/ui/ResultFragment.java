@@ -50,15 +50,6 @@ public class ResultFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param resultText Parameter 1.
-     * @param resultImage Parameter 2.
-     * @return A new instance of fragment ResultFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ResultFragment newInstance(String resultText, int resultImage) {
         ResultFragment fragment = new ResultFragment();
         Bundle args = new Bundle();

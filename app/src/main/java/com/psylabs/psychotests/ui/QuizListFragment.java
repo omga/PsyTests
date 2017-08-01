@@ -26,10 +26,8 @@ import javax.inject.Inject;
  */
 public class QuizListFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String ARG_CATEGORY_ID = "category-id";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private int mCategoryId;
     private OnListFragmentInteractionListener mListener;
@@ -43,7 +41,6 @@ public class QuizListFragment extends Fragment {
     public QuizListFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static QuizListFragment newInstance(int columnCount, int categoryId) {
         QuizListFragment fragment = new QuizListFragment();
