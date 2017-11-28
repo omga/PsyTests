@@ -4,18 +4,19 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.psylabs.psychotests.ui.ResultFragment">
+
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true">
+
         <TextView
             android:id="@+id/textResult"
+            style="@style/MyTextContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/hello_blank_fragment"
             android:gravity="center"
-            style="@style/MyTextContent"
-            />
+            android:text="@string/hello_blank_fragment" />
     </android.support.v4.widget.NestedScrollView>
 
 
