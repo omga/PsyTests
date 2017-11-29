@@ -16,8 +16,7 @@
         <activity
             android:name="com.psylabs.psychotests.ui.MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:theme="@style/TranslucentStatusTheme">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,8 +27,7 @@
             android:name="com.psylabs.psychotests.ui.QuizActivity"
             android:label="@string/title_activity_quiz"
             android:parentActivityName="com.psylabs.psychotests.ui.MainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/TranslucentStatusTheme" />
+            android:screenOrientation="portrait" />
     </application>
     <meta-data
         android:name="android.support.VERSION"
