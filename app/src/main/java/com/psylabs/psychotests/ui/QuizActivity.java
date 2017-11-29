@@ -1,9 +1,7 @@
 package com.psylabs.psychotests.ui;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -24,7 +22,13 @@ import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.reward.RewardItem;
+import com.google.android.gms.ads.reward.RewardedVideoAd;
+import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import com.psylabs.psychotests.App;
 import com.psylabs.psychotests.R;
 import com.psylabs.psychotests.model.QuizItem;
@@ -38,8 +42,6 @@ import com.psylabs.psychotests.ui.adapter.AppBarStateChangeListener;
 
 import org.parceler.Parcels;
 
-import java.io.File;
-
 import javax.inject.Inject;
 
 import butterknife.BindView;
@@ -49,7 +51,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class QuizActivity extends AppCompatActivity {
+public class QuizActivity extends AppCompatActivity implements RewardedVideoAdListener {
 
     public static final String QUIZ_EXTRA = "QUIZ_XTR";
     private static final String TAG = "QuizActivity";
@@ -70,14 +72,18 @@ public class QuizActivity extends AppCompatActivity {
     FloatingActionButton fab;
     @BindView(R.id.fabBottom)
     FloatingActionButton fabBottom;
+    int mStackLevel = 0;
+    QuizItem quiz;
     private AppBarStateChangeListener appBarListener;
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
     private Interpolator interpolator;
-    int mStackLevel = 0;
-    QuizItem quiz;
     private Disposable subscription;
     private int imgResId;
+
+    //AdMob stuff
+    private RewardedVideoAd mRewardedVideoAd;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,13 +96,19 @@ public class QuizActivity extends AppCompatActivity {
 //        ViewCompat.setTransitionName(appBarLayout, EXTRA_IMAGE);
         setSupportActionBar(toolbar);
         Parcelable parcelable = getIntent().getParcelableExtra(QUIZ_EXTRA);
-        if(parcelable !=null) {
+        if (parcelable != null) {
             quiz = Parcels.unwrap(parcelable);
             init();
-            if(savedInstanceState == null)
+            if (savedInstanceState == null)
                 addFragment();
         }
+
+        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
+        mRewardedVideoAd.setRewardedVideoAdListener(this);
+        loadRewardedVideoAd();
+
     }
+
     private void init() {
         interpolator = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ?
                 AnimationUtils.loadInterpolator(this, android.R.interpolator.linear_out_slow_in) :
@@ -105,7 +117,7 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onStateChanged(AppBarLayout appBarLayout, State state) {
                 Log.d(TAG, state.name());
-                if(state.equals(State.COLLAPSED)) {
+                if (state.equals(State.COLLAPSED)) {
                     fabBottom.show();
                 } else {
                     fabBottom.hide();
@@ -131,7 +143,7 @@ public class QuizActivity extends AppCompatActivity {
                 ContextCompat.getColor(this, R.color.colorPrimary));
         collapsingToolbar.setStatusBarScrimColor(
                 ContextCompat.getColor(this, R.color.colorPrimaryDark));
-        if (getSupportActionBar() != null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
@@ -149,7 +161,7 @@ public class QuizActivity extends AppCompatActivity {
                     ContextCompat.getColor(QuizActivity.this, R.color.colorPrimary)));
             collapsingToolbar.setStatusBarScrimColor(palette.getMutedColor(
                     ContextCompat.getColor(QuizActivity.this, R.color.colorPrimary)));
-            });
+        });
     }
 
     private void initActivityTransitions() {
@@ -159,6 +171,18 @@ public class QuizActivity extends AppCompatActivity {
             getWindow().setEnterTransition(transition);
             getWindow().setReturnTransition(transition);
         }
+    }
+
+    @Override
+    public void onResume() {
+        mRewardedVideoAd.resume(this);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        mRewardedVideoAd.pause(this);
+        super.onPause();
     }
 
     @Override
@@ -179,13 +203,14 @@ public class QuizActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
+        mRewardedVideoAd.resume(this);
         unsubscribe();
         super.onDestroy();
     }
 
     @OnClick({R.id.fab, R.id.fabBottom})
     public void fabClick() {
-        Log.d(TAG,"startQuiz");
+        Log.d(TAG, "startQuiz");
         rxBus.send(new StartQuizEvent());
 //        appBarLayout.setExpanded(false);
 
@@ -197,7 +222,7 @@ public class QuizActivity extends AppCompatActivity {
                 (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
         p.setAnchorId(R.id.app_bar);
         fab.setLayoutParams(p);
-        if(appBarLayout.getHeight() - appBarLayout.getBottom() == 0)
+        if (appBarLayout.getHeight() - appBarLayout.getBottom() == 0)
             fab.show();
         else
             fabBottom.show();
@@ -216,7 +241,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private void setFabShare(String sharingText) {
         View.OnClickListener listener = v -> {
-            if(Util.checkPermission(QuizActivity.this))
+            if (Util.checkPermission(QuizActivity.this))
                 Util.shareSocial(this, sharingText, imgResId);
         };
         fab.setImageResource(R.drawable.ic_action_share);
@@ -230,33 +255,82 @@ public class QuizActivity extends AppCompatActivity {
         subscription = rxBus.toObservable().observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(o -> {
-            Log.d(TAG,"rxbus accept");
-            if (o instanceof ImageToolbarEvent) {
-                Log.d(TAG,"rxbus setFabForwardIcon");
-                setImageToolbar(((ImageToolbarEvent) o).imageResId);
-            } else if( o instanceof QuizFinishedEvent) {
-                String resultText = ((QuizFinishedEvent) o).result;
-                setFabShare(resultText);
-                Fragment newFragment = ResultFragment.newInstance(
-                        resultText, ((QuizFinishedEvent) o).resultImage);
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.container, newFragment);
-                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                    Log.d(TAG, "rxbus accept");
+                    if (o instanceof ImageToolbarEvent) {
+                        Log.d(TAG, "rxbus setFabForwardIcon");
+                        setImageToolbar(((ImageToolbarEvent) o).imageResId);
+                    } else if (o instanceof QuizFinishedEvent) {
+                        String resultText = ((QuizFinishedEvent) o).result;
+                        showResult(resultText, ((QuizFinishedEvent) o).resultImage);
+                        if (mRewardedVideoAd.isLoaded()) {
+                            mRewardedVideoAd.show();
+                        }
+                    }
+                });
+    }
+
+    private void showResult(String resultText, int resultImage) {
+        setFabShare(resultText);
+        Fragment newFragment = ResultFragment.newInstance(
+                resultText, resultImage);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.container, newFragment);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //                ft.addToBackStack(null);
-                ft.commit();
-            }
-        });
+        ft.commit();
     }
 
     private void unsubscribe() {
-        if(!subscription.isDisposed())
+        if (!subscription.isDisposed())
             subscription.dispose();
     }
 
+    private void loadRewardedVideoAd() {
+        mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
+                new AdRequest.Builder().build());
+    }
 
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void onRewarded(RewardItem reward) {
+        Toast.makeText(this, "onRewarded! currency: " + reward.getType() + "  amount: " +
+                reward.getAmount(), Toast.LENGTH_SHORT).show();
+        // Reward the user.
+    }
+
+    @Override
+    public void onRewardedVideoAdLeftApplication() {
+        Toast.makeText(this, "onRewardedVideoAdLeftApplication",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoAdClosed() {
+        Toast.makeText(this, "onRewardedVideoAdClosed", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoAdFailedToLoad(int errorCode) {
+        Toast.makeText(this, "onRewardedVideoAdFailedToLoad", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoAdLoaded() {
+        Toast.makeText(this, "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoAdOpened() {
+        Toast.makeText(this, "onRewardedVideoAdOpened", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoStarted() {
+        Toast.makeText(this, "onRewardedVideoStarted", Toast.LENGTH_SHORT).show();
     }
 }
