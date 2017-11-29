@@ -13,16 +13,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
@@ -35,6 +36,7 @@ import com.psylabs.psychotests.model.QuizItem;
 import com.psylabs.psychotests.model.rx.ImageToolbarEvent;
 import com.psylabs.psychotests.model.rx.QuizFinishedEvent;
 import com.psylabs.psychotests.model.rx.StartQuizEvent;
+import com.psylabs.psychotests.service.AdManager;
 import com.psylabs.psychotests.service.ResourceManager;
 import com.psylabs.psychotests.service.RxBus;
 import com.psylabs.psychotests.service.Util;
@@ -60,6 +62,8 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
     ResourceManager resourceManager;
     @Inject
     RxBus rxBus;
+    @Inject
+    AdManager adManager;
     @BindView(R.id.app_bar)
     AppBarLayout appBarLayout;
     @BindView(R.id.toolbar)
@@ -83,6 +87,7 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
 
     //AdMob stuff
     private RewardedVideoAd mRewardedVideoAd;
+    private boolean isVideoLoadingStarted;
 
 
     @Override
@@ -102,10 +107,6 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
             if (savedInstanceState == null)
                 addFragment();
         }
-
-        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
-        mRewardedVideoAd.setRewardedVideoAdListener(this);
-        loadRewardedVideoAd();
 
     }
 
@@ -127,6 +128,8 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
         setupToolbar();
         addFabListener();
         subscribe();
+        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
+        mRewardedVideoAd.setRewardedVideoAdListener(this);
     }
 
     private void addFragment() {
@@ -212,6 +215,7 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
     public void fabClick() {
         Log.d(TAG, "startQuiz");
         rxBus.send(new StartQuizEvent());
+        loadRewardedVideoAd();
 //        appBarLayout.setExpanded(false);
 
     }
@@ -286,8 +290,11 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
     }
 
     private void loadRewardedVideoAd() {
-        mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
-                new AdRequest.Builder().build());
+        if (!isVideoLoadingStarted) {
+            isVideoLoadingStarted = true;
+            mRewardedVideoAd.loadAd(getString(R.string.app_id),
+                    new AdRequest.Builder().build());
+        }
     }
 
     @Override
@@ -298,39 +305,53 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
 
     @Override
     public void onRewarded(RewardItem reward) {
-        Toast.makeText(this, "onRewarded! currency: " + reward.getType() + "  amount: " +
-                reward.getAmount(), Toast.LENGTH_SHORT).show();
+        Log.d("OnReward", "onRewarded! currency: " + reward.getType() + "  amount: " +
+                reward.getAmount());
+        adManager.rewardUser(reward.getAmount());
         // Reward the user.
     }
 
     @Override
     public void onRewardedVideoAdLeftApplication() {
-        Toast.makeText(this, "onRewardedVideoAdLeftApplication",
-                Toast.LENGTH_SHORT).show();
+        Log.d("OnReward", "onRewardedVideoAdLeftApplication");
     }
 
     @Override
     public void onRewardedVideoAdClosed() {
-        Toast.makeText(this, "onRewardedVideoAdClosed", Toast.LENGTH_SHORT).show();
+        Log.d("OnReward", "onRewardedVideoAdClosed");
+        if (!adManager.isUserAllowedToSkipAd()) {
+            isVideoLoadingStarted = false;
+            loadRewardedVideoAd();
+            new AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setView(LayoutInflater.from(this).inflate(R.layout.dialog_image_layout, null))
+                    .setTitle(R.string.dialog_video_ad_title)
+                    .setPositiveButton(R.string.dialog_ok, (dialogInterface, i) ->
+                            runOnUiThread(() -> mRewardedVideoAd.show()))
+                    .show();
+        }
+        adManager.punishUser(2);
     }
 
     @Override
     public void onRewardedVideoAdFailedToLoad(int errorCode) {
-        Toast.makeText(this, "onRewardedVideoAdFailedToLoad", Toast.LENGTH_SHORT).show();
+        Log.d("OnReward", "onRewardedVideoAdFailedToLoad");
+        adManager.punishUser(1);
+
     }
 
     @Override
     public void onRewardedVideoAdLoaded() {
-        Toast.makeText(this, "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
+        Log.d("OnReward", "onRewardedVideoAdLoaded");
     }
 
     @Override
     public void onRewardedVideoAdOpened() {
-        Toast.makeText(this, "onRewardedVideoAdOpened", Toast.LENGTH_SHORT).show();
+        Log.d("OnReward", "onRewardedVideoAdOpened");
     }
 
     @Override
     public void onRewardedVideoStarted() {
-        Toast.makeText(this, "onRewardedVideoStarted", Toast.LENGTH_SHORT).show();
+        Log.d("OnReward", "onRewardedVideoStarted");
     }
 }

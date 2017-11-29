@@ -131,4 +131,7 @@
     <string name="redo_quiz">Пройти заново</string>
     <string name="goto_new_quiz">Пройти другой тест</string>
     <string name="sharing_text">Попробуй приложение Мой Психолог- классные психологические теты</string>
+    <string name="dialog_video_ad_title">Сначала посмотри видео ;)</string>
+    <string name="dialog_video_ad_message">WATCH VIDEO WATCH VIDEO WATCH VIDEO WATCH VIDEO WATCH VIDEO WATCH VIDEO WATCH VIDEO WATCH VIDEO WATCH VIDEO WATCH VIDEO WATCH VIDEO WATCH VIDEO WATCH VIDEO </string>
+    <string name="dialog_ok">Ok</string>
 </resources>
