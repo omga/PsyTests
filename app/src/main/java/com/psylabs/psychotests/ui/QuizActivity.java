@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
@@ -128,6 +129,8 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
         setupToolbar();
         addFabListener();
         subscribe();
+        MobileAds.initialize(this, getString(R.string.app_id));
+
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
         mRewardedVideoAd.setRewardedVideoAdListener(this);
     }
@@ -292,7 +295,7 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
     private void loadRewardedVideoAd() {
         if (!isVideoLoadingStarted) {
             isVideoLoadingStarted = true;
-            mRewardedVideoAd.loadAd(getString(R.string.app_id),
+            mRewardedVideoAd.loadAd(getString(R.string.ad_unit_id),
                     new AdRequest.Builder().build());
         }
     }
@@ -336,6 +339,7 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
     @Override
     public void onRewardedVideoAdFailedToLoad(int errorCode) {
         Log.d("OnReward", "onRewardedVideoAdFailedToLoad");
+        Toast.makeText(this, "FAILED " + errorCode, Toast.LENGTH_SHORT).show();
         adManager.punishUser(1);
 
     }
@@ -343,6 +347,8 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
     @Override
     public void onRewardedVideoAdLoaded() {
         Log.d("OnReward", "onRewardedVideoAdLoaded");
+        Toast.makeText(this, "FAILED", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
