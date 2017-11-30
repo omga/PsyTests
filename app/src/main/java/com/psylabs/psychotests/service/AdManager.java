@@ -39,7 +39,7 @@ public class AdManager {
             return true;
         }
         if (currentPoints < 5) {
-            sharedPrefs.edit().putInt(USER_POINTS, 0).apply();
+            sharedPrefs.edit().putInt(USER_POINTS, 1).apply();
         }
         return false;
     }

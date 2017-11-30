@@ -24,7 +24,6 @@ import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
@@ -332,14 +331,14 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
                     .setPositiveButton(R.string.dialog_ok, (dialogInterface, i) ->
                             runOnUiThread(() -> mRewardedVideoAd.show()))
                     .show();
+        } else {
+            adManager.punishUser(2);
         }
-        adManager.punishUser(2);
     }
 
     @Override
     public void onRewardedVideoAdFailedToLoad(int errorCode) {
         Log.d("OnReward", "onRewardedVideoAdFailedToLoad");
-        Toast.makeText(this, "FAILED " + errorCode, Toast.LENGTH_SHORT).show();
         adManager.punishUser(1);
 
     }
@@ -347,7 +346,6 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
     @Override
     public void onRewardedVideoAdLoaded() {
         Log.d("OnReward", "onRewardedVideoAdLoaded");
-        Toast.makeText(this, "FAILED", Toast.LENGTH_SHORT).show();
 
     }
 
