@@ -13,23 +13,19 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.transition.Slide;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
 
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.reward.RewardItem;
-import com.google.android.gms.ads.reward.RewardedVideoAd;
-import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import com.psylabs.psychotests.App;
 import com.psylabs.psychotests.R;
 import com.psylabs.psychotests.model.QuizItem;
@@ -53,7 +49,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class QuizActivity extends AppCompatActivity implements RewardedVideoAdListener {
+public class QuizActivity extends AppCompatActivity {
 
     public static final String QUIZ_EXTRA = "QUIZ_XTR";
     private static final String TAG = "QuizActivity";
@@ -86,9 +82,7 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
     private int imgResId;
 
     //AdMob stuff
-    private RewardedVideoAd mRewardedVideoAd;
-    private boolean isVideoLoadingStarted;
-
+    private InterstitialAd mInterstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,9 +123,10 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
         addFabListener();
         subscribe();
         MobileAds.initialize(this, getString(R.string.app_id));
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getString(R.string.ad_image_unit_id));
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
-        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
-        mRewardedVideoAd.setRewardedVideoAdListener(this);
     }
 
     private void addFragment() {
@@ -179,18 +174,6 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
     }
 
     @Override
-    public void onResume() {
-        mRewardedVideoAd.resume(this);
-        super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        mRewardedVideoAd.pause(this);
-        super.onPause();
-    }
-
-    @Override
     protected void onStart() {
         Log.d(TAG, "onStart");
 //        subscribe();
@@ -208,7 +191,6 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
-        mRewardedVideoAd.resume(this);
         unsubscribe();
         super.onDestroy();
     }
@@ -217,7 +199,6 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
     public void fabClick() {
         Log.d(TAG, "startQuiz");
         rxBus.send(new StartQuizEvent());
-        loadRewardedVideoAd();
 //        appBarLayout.setExpanded(false);
 
     }
@@ -268,8 +249,8 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
                     } else if (o instanceof QuizFinishedEvent) {
                         String resultText = ((QuizFinishedEvent) o).result;
                         showResult(resultText, ((QuizFinishedEvent) o).resultImage);
-                        if (mRewardedVideoAd.isLoaded()) {
-                            mRewardedVideoAd.show();
+                        if (mInterstitialAd.isLoaded()) {
+                            mInterstitialAd.show();
                         }
                     }
                 });
@@ -291,71 +272,10 @@ public class QuizActivity extends AppCompatActivity implements RewardedVideoAdLi
             subscription.dispose();
     }
 
-    private void loadRewardedVideoAd() {
-        if (!isVideoLoadingStarted) {
-            isVideoLoadingStarted = true;
-            mRewardedVideoAd.loadAd(getString(R.string.ad_unit_id),
-                    new AdRequest.Builder().build());
-        }
-    }
-
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
     }
 
-    @Override
-    public void onRewarded(RewardItem reward) {
-        Log.d("OnReward", "onRewarded! currency: " + reward.getType() + "  amount: " +
-                reward.getAmount());
-        adManager.rewardUser(reward.getAmount());
-        // Reward the user.
-    }
-
-    @Override
-    public void onRewardedVideoAdLeftApplication() {
-        Log.d("OnReward", "onRewardedVideoAdLeftApplication");
-    }
-
-    @Override
-    public void onRewardedVideoAdClosed() {
-        Log.d("OnReward", "onRewardedVideoAdClosed");
-        if (!adManager.isUserAllowedToSkipAd()) {
-            isVideoLoadingStarted = false;
-            loadRewardedVideoAd();
-            new AlertDialog.Builder(this)
-                    .setCancelable(false)
-                    .setView(LayoutInflater.from(this).inflate(R.layout.dialog_image_layout, null))
-                    .setTitle(R.string.dialog_video_ad_title)
-                    .setPositiveButton(R.string.dialog_ok, (dialogInterface, i) ->
-                            runOnUiThread(() -> mRewardedVideoAd.show()))
-                    .show();
-        } else {
-            adManager.punishUser(2);
-        }
-    }
-
-    @Override
-    public void onRewardedVideoAdFailedToLoad(int errorCode) {
-        Log.d("OnReward", "onRewardedVideoAdFailedToLoad");
-        adManager.punishUser(1);
-
-    }
-
-    @Override
-    public void onRewardedVideoAdLoaded() {
-        Log.d("OnReward", "onRewardedVideoAdLoaded");
-
-    }
-
-    @Override
-    public void onRewardedVideoAdOpened() {
-        Log.d("OnReward", "onRewardedVideoAdOpened");
-    }
-
-    @Override
-    public void onRewardedVideoStarted() {
-        Log.d("OnReward", "onRewardedVideoStarted");
-    }
 }
